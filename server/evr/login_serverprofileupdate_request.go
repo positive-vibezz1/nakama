@@ -6,17 +6,17 @@ import (
 )
 
 type UserServerProfileUpdateRequest struct {
-	EvrID   EvrId
+	XPID    XPID
 	Payload UpdatePayload
 }
 
 func (m UserServerProfileUpdateRequest) String() string {
-	return fmt.Sprintf("%T{EVRID:%s, MatchType:%s, SessionID:%s}", m, m.EvrID.String(), Symbol(m.Payload.MatchType).Token().String(), m.Payload.SessionID.String())
+	return fmt.Sprintf("%T{EVRID:%s, MatchType:%s, SessionID:%s}", m, m.XPID.String(), Symbol(m.Payload.MatchType).Token().String(), m.Payload.SessionID.String())
 }
 
 func (m *UserServerProfileUpdateRequest) Stream(s *EasyStream) error {
 	return RunErrorFunctions([]func() error{
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.EvrID) },
+		func() error { return s.StreamNumber(binary.LittleEndian, &m.XPID) },
 		func() error { return s.StreamJson(&m.Payload, true, NoCompression) },
 	})
 }

@@ -43,11 +43,11 @@ type MatchLabel struct {
 	SessionSettings *evr.LobbySessionSettings `json:"session_settings,omitempty"` // The session settings for the match (EVR).
 	TeamAlignments  map[string]int            `json:"team_alignments,omitempty"`  // map[userID]TeamIndex
 
-	server          runtime.Presence                // The broadcaster's presence
-	levelLoaded     bool                            // Whether the server has been sent the start instruction.
-	presenceMap     map[string]*EvrMatchPresence    // [sessionId]EvrMatchPresence
-	reservationMap  map[string]*slotReservation     // map[sessionID]slotReservation
-	presenceByEvrID map[evr.EvrId]*EvrMatchPresence // map[evrID]EvrMatchPresence
+	server         runtime.Presence               // The broadcaster's presence
+	levelLoaded    bool                           // Whether the server has been sent the start instruction.
+	presenceMap    map[string]*EvrMatchPresence   // [sessionId]EvrMatchPresence
+	reservationMap map[string]*slotReservation    // map[sessionID]slotReservation
+	presenceByXPID map[evr.XPID]*EvrMatchPresence // map[xpID]EvrMatchPresence
 
 	joinTimestamps       map[string]time.Time // The timestamps of when players joined the match. map[sessionId]time.Time
 	joinTimeMilliseconds map[string]int64     // The round clock time of when players joined the match. map[sessionId]time.Time
@@ -131,9 +131,9 @@ func (s *MatchLabel) GetNonPlayerCount() int {
 	return count
 }
 
-func (s *MatchLabel) GetPlayerByEvrID(evrID evr.EvrId) *PlayerInfo {
+func (s *MatchLabel) GetPlayerByXPID(xpID evr.XPID) *PlayerInfo {
 	for _, p := range s.Players {
-		if p.EvrID == evrID {
+		if p.XPID == xpID {
 			return &p
 		}
 	}
@@ -281,7 +281,7 @@ func (s *MatchLabel) rebuildCache() {
 				UserID:      p.UserID.String(),
 				Username:    p.Username,
 				DisplayName: p.DisplayName,
-				EvrID:       p.EvrID,
+				XPID:        p.XPID,
 				Team:        TeamIndex(p.RoleAlignment),
 				ClientIP:    p.ClientIP,
 				DiscordID:   p.DiscordID,
@@ -295,7 +295,7 @@ func (s *MatchLabel) rebuildCache() {
 					UserID:         p.UserID.String(),
 					Username:       p.Username,
 					DisplayName:    p.DisplayName,
-					EvrID:          p.EvrID,
+					XPID:           p.XPID,
 					Team:           TeamIndex(p.RoleAlignment),
 					ClientIP:       p.ClientIP,
 					DiscordID:      p.DiscordID,
@@ -310,7 +310,7 @@ func (s *MatchLabel) rebuildCache() {
 					UserID:         p.UserID.String(),
 					Username:       p.Username,
 					DisplayName:    p.DisplayName,
-					EvrID:          p.EvrID,
+					XPID:           p.XPID,
 					Team:           TeamIndex(p.RoleAlignment),
 					ClientIP:       p.ClientIP,
 					DiscordID:      p.DiscordID,
@@ -328,7 +328,7 @@ func (s *MatchLabel) rebuildCache() {
 					UserID:        p.UserID.String(),
 					Username:      p.Username,
 					DisplayName:   p.DisplayName,
-					EvrID:         p.EvrID,
+					XPID:          p.XPID,
 					Team:          AnyTeam, // Roles are not tracked in private matches.
 					ClientIP:      p.ClientIP,
 					DiscordID:     p.DiscordID,
@@ -340,7 +340,7 @@ func (s *MatchLabel) rebuildCache() {
 					UserID:        p.UserID.String(),
 					Username:      p.Username,
 					DisplayName:   p.DisplayName,
-					EvrID:         p.EvrID,
+					XPID:          p.XPID,
 					Team:          TeamIndex(p.RoleAlignment),
 					ClientIP:      p.ClientIP,
 					DiscordID:     p.DiscordID,
@@ -352,7 +352,7 @@ func (s *MatchLabel) rebuildCache() {
 					UserID:        p.UserID.String(),
 					Username:      p.Username,
 					DisplayName:   p.DisplayName,
-					EvrID:         p.EvrID,
+					XPID:          p.XPID,
 					Team:          TeamIndex(p.RoleAlignment),
 					ClientIP:      p.ClientIP,
 					DiscordID:     p.DiscordID,
@@ -478,7 +478,7 @@ func (l *MatchLabel) PublicView() *MatchLabel {
 				UserID:        l.Players[i].UserID,
 				Username:      l.Players[i].Username,
 				DisplayName:   l.Players[i].DisplayName,
-				//EvrID:          l.Players[i].EvrID,
+				//XPID:          l.Players[i].XPID,
 				Team:           l.Players[i].Team,
 				DiscordID:      l.Players[i].DiscordID,
 				PartyID:        l.Players[i].PartyID,

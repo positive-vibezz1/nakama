@@ -1,7 +1,6 @@
 package evr
 
 import (
-	"encoding/binary"
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
@@ -10,35 +9,26 @@ import (
 // client -> nakama: request the user profile for their logged-in account.
 type LoggedInUserProfileRequest struct {
 	Session            uuid.UUID
-	EvrID              EvrId
+	XPID               XPID
 	ProfileRequestData ProfileRequestData
 }
 
-func (m LoggedInUserProfileRequest) Token() string {
-	return "SNSLoggedInUserProfileRequest"
-}
-
-func (m LoggedInUserProfileRequest) Symbol() Symbol {
-	return ToSymbol(m.Token())
-}
-
 func (r LoggedInUserProfileRequest) String() string {
-	return fmt.Sprintf("LoggedInUserProfileRequest(session=%v, user_id=%v, profile_request=%v)", r.Session, r.EvrID, r.ProfileRequestData)
+	return fmt.Sprintf("LoggedInUserProfileRequest(session=%v, user_id=%v, profile_request=%v)", r.Session, r.XPID, r.ProfileRequestData)
 }
 
 func (m *LoggedInUserProfileRequest) Stream(s *EasyStream) error {
 	return RunErrorFunctions([]func() error{
 		func() error { return s.StreamGUID(&m.Session) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.EvrID.PlatformCode) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.EvrID.AccountId) },
+		func() error { return s.StreamStruct(&m.XPID) },
 		func() error { return s.StreamJson(&m.ProfileRequestData, true, NoCompression) },
 	})
 }
 
-func NewLoggedInUserProfileRequest(session uuid.UUID, evrId EvrId, profileRequestData ProfileRequestData) LoggedInUserProfileRequest {
+func NewLoggedInUserProfileRequest(session uuid.UUID, evrId XPID, profileRequestData ProfileRequestData) LoggedInUserProfileRequest {
 	return LoggedInUserProfileRequest{
 		Session:            session,
-		EvrID:              evrId,
+		XPID:               evrId,
 		ProfileRequestData: profileRequestData,
 	}
 }
@@ -46,8 +36,8 @@ func (m *LoggedInUserProfileRequest) GetLoginSessionID() uuid.UUID {
 	return m.Session
 }
 
-func (m *LoggedInUserProfileRequest) GetEvrID() EvrId {
-	return m.EvrID
+func (m *LoggedInUserProfileRequest) GetXPID() XPID {
+	return m.XPID
 }
 
 type ProfileRequestData struct {

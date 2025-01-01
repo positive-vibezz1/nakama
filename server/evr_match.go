@@ -172,7 +172,7 @@ func (m *EvrMatch) MatchInit(ctx context.Context, logger runtime.Logger, db *sql
 		Players:          make([]PlayerInfo, 0, SocialLobbyMaxSize),
 		presenceMap:      make(map[string]*EvrMatchPresence, SocialLobbyMaxSize),
 		reservationMap:   make(map[string]*slotReservation, 2),
-		presenceByEvrID:  make(map[evr.EvrId]*EvrMatchPresence, SocialLobbyMaxSize),
+		presenceByXPID:   make(map[evr.XPID]*EvrMatchPresence, SocialLobbyMaxSize),
 		goals:            make([]*MatchGoal, 0),
 
 		TeamAlignments:       make(map[string]int, SocialLobbyMaxSize),
@@ -202,7 +202,7 @@ func (m *EvrMatch) MatchInit(ctx context.Context, logger runtime.Logger, db *sql
 var (
 	ErrJoinRejectReasonUnassignedLobby           = errors.New("unassigned lobby")
 	ErrJoinRejectReasonDuplicateJoin             = errors.New("duplicate join")
-	ErrJoinRejectDuplicateEvrID                  = errors.New("duplicate evr id")
+	ErrJoinRejectDuplicateXPID                   = errors.New("duplicate evr id")
 	ErrJoinRejectReasonLobbyFull                 = errors.New("lobby full")
 	ErrJoinRejectReasonFailedToAssignTeam        = errors.New("failed to assign team")
 	ErrJoinInvalidRoleForLevel                   = errors.New("invalid role for level")
@@ -317,16 +317,16 @@ func (m *EvrMatch) MatchJoinAttempt(ctx context.Context, logger runtime.Logger, 
 		}
 	}
 
-	// Check both the match's presence and reservation map for a duplicate join with the same EvrID
+	// Check both the match's presence and reservation map for a duplicate join with the same XPID
 	for _, p := range meta.Presences() {
 
 		for _, e := range state.presenceMap {
-			if e.EvrID.Equals(p.EvrID) {
+			if e.XPID == p.XPID {
 				logger.WithFields(map[string]interface{}{
-					"evr_id": p.EvrID,
-					"uid":    p.GetUserId(),
+					"xp_id": p.XPID,
+					"uid":   p.GetUserId(),
 				}).Error("Duplicate EVR-ID join attempt.")
-				return state, false, ErrJoinRejectDuplicateEvrID.Error()
+				return state, false, ErrJoinRejectDuplicateXPID.Error()
 			}
 		}
 	}
@@ -405,7 +405,7 @@ func (m *EvrMatch) MatchJoinAttempt(ctx context.Context, logger runtime.Logger, 
 	// Add the player
 	sessionID := meta.Presence.GetSessionId()
 	state.presenceMap[sessionID] = meta.Presence
-	state.presenceByEvrID[meta.Presence.EvrID] = meta.Presence
+	state.presenceByXPID[meta.Presence.XPID] = meta.Presence
 	state.joinTimestamps[sessionID] = time.Now()
 
 	if err := m.updateLabel(dispatcher, state); err != nil {
@@ -544,7 +544,7 @@ func (m *EvrMatch) MatchLeave(ctx context.Context, logger runtime.Logger, db *sq
 			}
 
 			delete(state.presenceMap, p.GetSessionId())
-			delete(state.presenceByEvrID, mp.EvrID)
+			delete(state.presenceByXPID, mp.XPID)
 			delete(state.joinTimestamps, p.GetSessionId())
 
 		}
@@ -658,9 +658,9 @@ func (m *EvrMatch) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql
 				}
 
 				// Find the player in the match
-				presence := state.presenceByEvrID[s.XPlatformId]
+				presence := state.presenceByXPID[s.XPID]
 				if presence == nil {
-					logger.Warn("Player not found in match: %s", s.XPlatformId)
+					logger.Warn("Player not found in match: %s", s.XPID)
 					continue
 				}
 				presence.Ping = int(s.Ping)
@@ -1096,7 +1096,7 @@ func (m *EvrMatch) MatchStart(ctx context.Context, logger runtime.Logger, nk run
 	}
 
 	state.StartTime = time.Now().UTC()
-	entrants := make([]evr.EvrId, 0)
+	entrants := make([]evr.XPID, 0)
 	message := evr.NewGameServerSessionStart(state.ID.UUID, groupID, uint8(state.MaxSize), uint8(state.LobbyType), state.Broadcaster.AppId, state.Mode, state.Level, state.RequiredFeatures, entrants)
 
 	logger.WithField("message", message).Info("Starting session.")

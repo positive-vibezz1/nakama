@@ -20,7 +20,7 @@ type PlayerInfo struct {
 	Username       string    `json:"username,omitempty"`
 	DiscordID      string    `json:"discord_id,omitempty"`
 	UserID         string    `json:"user_id,omitempty"`
-	EvrID          evr.EvrId `json:"evr_id,omitempty"`
+	XPID           evr.XPID  `json:"xp_id,omitempty"`
 	ClientIP       string    `json:"client_ip,omitempty"`
 	Query          string    `json:"query,omitempty"`
 }

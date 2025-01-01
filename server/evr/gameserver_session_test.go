@@ -58,9 +58,9 @@ func TestGameServerSessionParsers(t *testing.T) {
 				TickCount:     26400,
 				Slots: []*EntrantData{
 					{
-						XPlatformId: EvrId{12, 4702111234474983745},
-						TeamIndex:   0x0a,
-						Ping:        0x0,
+						XPID:      NewXPID(12, 4702111234474983745),
+						TeamIndex: 0x0a,
+						Ping:      0x0,
 					},
 				},
 			},

@@ -7,7 +7,7 @@ import (
 
 // OtherUserProfileRequest represents a message from client to server requesting the user profile for another user.
 type OtherUserProfileRequest struct {
-	EvrId EvrId           // The user identifier.
+	EvrId XPID            // The user identifier.
 	Data  json.RawMessage // The request data for the underlying profile, indicating fields of interest.
 }
 
@@ -19,7 +19,7 @@ func (m *OtherUserProfileRequest) Stream(s *EasyStream) error {
 }
 
 // NewOtherUserProfileRequestWithArgs initializes a new OtherUserProfileRequest message with the provided arguments.
-func NewOtherUserProfileRequest(userID EvrId, data []byte) *OtherUserProfileRequest {
+func NewOtherUserProfileRequest(userID XPID, data []byte) *OtherUserProfileRequest {
 	return &OtherUserProfileRequest{
 		EvrId: userID,
 		Data:  data,
@@ -28,5 +28,5 @@ func NewOtherUserProfileRequest(userID EvrId, data []byte) *OtherUserProfileRequ
 
 // String returns a string representation of the OtherUserProfileRequest message.
 func (m *OtherUserProfileRequest) String() string {
-	return fmt.Sprintf("%T(evr_id=%s)", m, m.EvrId.String())
+	return fmt.Sprintf("%T(xp_id=%s)", m, m.EvrId.String())
 }

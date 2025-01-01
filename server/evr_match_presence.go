@@ -26,7 +26,7 @@ type EvrMatchPresence struct {
 	SessionID         uuid.UUID    `json:"session_id,omitempty"`       // The Player's "match" connection session ID
 	LoginSessionID    uuid.UUID    `json:"login_session_id,omitempty"` // The Player's "login" connection session ID
 	UserID            uuid.UUID    `json:"user_id,omitempty"`
-	EvrID             evr.EvrId    `json:"evr_id,omitempty"`
+	XPID              evr.XPID     `json:"xp_id,omitempty"`
 	DiscordID         string       `json:"discord_id,omitempty"`
 	ClientIP          string       `json:"client_ip,omitempty"`
 	ClientPort        string       `json:"client_port,omitempty"`
@@ -46,7 +46,7 @@ type EvrMatchPresence struct {
 }
 
 func (p EvrMatchPresence) EntrantID(matchID MatchID) uuid.UUID {
-	return NewEntrantID(matchID, p.EvrID)
+	return NewEntrantID(matchID, p.XPID)
 }
 
 func (p EvrMatchPresence) GetUserId() string {
@@ -74,8 +74,8 @@ func (p EvrMatchPresence) GetStatus() string {
 func (p *EvrMatchPresence) GetReason() runtime.PresenceReason {
 	return runtime.PresenceReasonUnknown
 }
-func (p EvrMatchPresence) GetEvrID() string {
-	return p.EvrID.Token()
+func (p EvrMatchPresence) GetXPID() string {
+	return p.XPID.Token()
 }
 
 func (p EvrMatchPresence) IsPlayer() bool {
@@ -102,8 +102,8 @@ func (p EvrMatchPresence) String() string {
 	return string(data)
 }
 
-func NewEntrantID(matchID MatchID, evrID evr.EvrId) uuid.UUID {
-	return uuid.NewV5(matchID.UUID, EntrantIDSaltStr+evrID.String())
+func NewEntrantID(matchID MatchID, xpID evr.XPID) uuid.UUID {
+	return uuid.NewV5(matchID.UUID, EntrantIDSaltStr+xpID.String())
 }
 
 func EntrantPresenceFromLobbyParams(session Session, lobbyParams *LobbySessionParameters) (*EvrMatchPresence, error) {
@@ -121,7 +121,7 @@ func EntrantPresenceFromLobbyParams(session Session, lobbyParams *LobbySessionPa
 		LoginSessionID:    params.LoginSession.Load().ID(),
 		Username:          session.Username(),
 		DisplayName:       lobbyParams.DisplayName,
-		EvrID:             params.XPID,
+		XPID:              params.XPID,
 		PartyID:           lobbyParams.PartyID,
 		RoleAlignment:     lobbyParams.Role,
 		DiscordID:         params.DiscordID,

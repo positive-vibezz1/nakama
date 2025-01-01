@@ -110,10 +110,7 @@ func TestDeveloperFeatures_Omitted_When_Empty(t *testing.T) {
 		BeforeDev: "before",
 		DeveloperFeatures: DeveloperFeatures{
 			DisableAfkTimeout: false,
-			EvrIDOverride: EvrId{
-				PlatformCode: 0,
-				AccountId:    0,
-			},
+			XPIDOverride:      NewXPID(1, 0),
 		},
 		AfterDev: "after",
 	}

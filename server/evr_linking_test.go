@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerateLinkTicket(t *testing.T) {
-	evrID, _ := evr.ParseEvrId("OVR-ORG-12345")
+	xpID, _ := evr.XPIDFromString("OVR-ORG-12345")
 
 	linkTickets := make(map[string]*LinkTicket)
 
@@ -16,7 +16,7 @@ func TestGenerateLinkTicket(t *testing.T) {
 		// Populate with necessary fields
 	}
 
-	ticket := generateLinkTicket(linkTickets, *evrID, "127.0.0.1", loginData)
+	ticket := generateLinkTicket(linkTickets, xpID, "127.0.0.1", loginData)
 
 	assert.NotNil(t, ticket, "Expected a non-nil link ticket")
 	assert.Equal(t, loginData, ticket.LoginProfile, "Expected LoginRequest to match")
@@ -25,11 +25,11 @@ func TestGenerateLinkTicket(t *testing.T) {
 
 func TestGenerateLinkTicketWithExistingToken(t *testing.T) {
 
-	evrID, _ := evr.ParseEvrId("OVR-ORG-12345")
+	xpID, _ := evr.XPIDFromString("OVR-ORG-12345")
 	linkTickets := map[string]*LinkTicket{
 		"existing-code": {
 			Code:         "existing-code",
-			XPID:         *evrID,
+			XPID:         xpID,
 			ClientIP:     "127.0.0.1",
 			LoginProfile: &evr.LoginProfile{},
 		},
@@ -37,7 +37,7 @@ func TestGenerateLinkTicketWithExistingToken(t *testing.T) {
 
 	loginData := &evr.LoginProfile{}
 
-	ticket := generateLinkTicket(linkTickets, *evrID, "127.0.0.1", loginData)
+	ticket := generateLinkTicket(linkTickets, xpID, "127.0.0.1", loginData)
 
 	assert.NotNil(t, ticket, "Expected a non-nil link ticket")
 

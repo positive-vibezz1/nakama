@@ -5,7 +5,7 @@ import (
 )
 
 type UpdateProfileSuccess struct {
-	UserId EvrId
+	UserId XPID
 }
 
 func (m *UpdateProfileSuccess) Token() string {
@@ -23,7 +23,7 @@ func (lr *UpdateProfileSuccess) String() string {
 func (m *UpdateProfileSuccess) Stream(s *EasyStream) error {
 	return s.StreamStruct(&m.UserId)
 }
-func NewSNSUpdateProfileSuccess(userId *EvrId) *UpdateProfileSuccess {
+func NewSNSUpdateProfileSuccess(userId *XPID) *UpdateProfileSuccess {
 	return &UpdateProfileSuccess{
 		UserId: *userId,
 	}

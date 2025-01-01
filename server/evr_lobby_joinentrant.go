@@ -87,7 +87,7 @@ func LobbyJoinEntrants(logger *zap.Logger, matchRegistry MatchRegistry, tracker 
 		err = NewLobbyErrorf(ServerDoesNotExist, "join attempt failed: match not found")
 	} else if labelStr == "" {
 		err = NewLobbyErrorf(ServerDoesNotExist, "join attempt failed: match label empty")
-	} else if reason == ErrJoinRejectDuplicateEvrID.Error() {
+	} else if reason == ErrJoinRejectDuplicateXPID.Error() {
 		err = NewLobbyErrorf(BadRequest, "join attempt failed: duplicate evr ID")
 	} else if reason == ErrJoinRejectReasonMatchClosed.Error() {
 		err = NewLobbyErrorf(ServerIsLocked, "join attempt failed: match closed")
@@ -154,7 +154,7 @@ func LobbyJoinEntrants(logger *zap.Logger, matchRegistry MatchRegistry, tracker 
 			PresenceMeta{Format: SessionFormatEVR, Username: e.Username, Status: matchIDStr, Hidden: false},
 		},
 		{
-			PresenceStream{Mode: StreamModeService, Subject: e.EvrID.UUID(), Label: StreamLabelMatchService},
+			PresenceStream{Mode: StreamModeService, Subject: e.XPID.UUID(), Label: StreamLabelMatchService},
 			PresenceMeta{Format: SessionFormatEVR, Username: e.Username, Status: matchIDStr, Hidden: false},
 		},
 	}

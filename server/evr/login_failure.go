@@ -10,7 +10,7 @@ const (
 )
 
 type LoginFailure struct {
-	UserId       EvrId
+	UserId       XPID
 	StatusCode   uint64 // HTTP Status code
 	ErrorMessage string
 }
@@ -30,14 +30,14 @@ func (m LoginFailure) String() string {
 
 func (m *LoginFailure) Stream(s *EasyStream) error {
 	return RunErrorFunctions([]func() error{
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.UserId.PlatformCode) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.UserId.AccountId) },
+		func() error { return s.StreamNumber(binary.LittleEndian, &m.UserId.ProviderID.PlatformID) },
+		func() error { return s.StreamNumber(binary.LittleEndian, &m.UserId.AccountID) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.StatusCode) },
 		func() error { return s.StreamString(&m.ErrorMessage, 160) },
 	})
 }
 
-func NewLoginFailure(userId EvrId, errorMessage string) *LoginFailure {
+func NewLoginFailure(userId XPID, errorMessage string) *LoginFailure {
 	return &LoginFailure{
 		UserId:       userId,
 		StatusCode:   DefaultErrorStatusCode,

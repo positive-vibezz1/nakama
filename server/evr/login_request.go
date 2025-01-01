@@ -1,7 +1,6 @@
 package evr
 
 import (
-	"encoding/binary"
 	"fmt"
 
 	"github.com/gofrs/uuid/v5"
@@ -10,7 +9,7 @@ import (
 // LoginRequest represents a message from client to server requesting for a user sign-in.
 type LoginRequest struct {
 	PreviousSessionID uuid.UUID // This is the old session id, if it had one.
-	XPID              EvrId
+	XPID              XPID
 	LoginData         LoginProfile
 }
 
@@ -21,13 +20,12 @@ func (lr LoginRequest) String() string {
 func (m *LoginRequest) Stream(s *EasyStream) error {
 	return RunErrorFunctions([]func() error{
 		func() error { return s.StreamGUID(&m.PreviousSessionID) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.XPID.PlatformCode) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.XPID.AccountId) },
+		func() error { return s.StreamStruct(&m.XPID) },
 		func() error { return s.StreamJson(&m.LoginData, true, NoCompression) },
 	})
 }
 
-func NewLoginRequest(session uuid.UUID, userId EvrId, loginData LoginProfile) (*LoginRequest, error) {
+func NewLoginRequest(session uuid.UUID, userId XPID, loginData LoginProfile) (*LoginRequest, error) {
 	return &LoginRequest{
 		PreviousSessionID: session,
 		XPID:              userId,
@@ -35,7 +33,7 @@ func NewLoginRequest(session uuid.UUID, userId EvrId, loginData LoginProfile) (*
 	}, nil
 }
 
-func (m *LoginRequest) GetEvrID() EvrId {
+func (m *LoginRequest) GetXPID() XPID {
 	return m.XPID
 }
 

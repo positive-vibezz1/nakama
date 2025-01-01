@@ -33,7 +33,7 @@ type WhoAmI struct {
 }
 
 type EvrIdLogins struct {
-	EvrId         string `json:"evr_id"`
+	EvrId         string `json:"xp_id"`
 	LastLoginTime string `json:"login_time"`
 	DisplayName   string `json:"display_name,omitempty"`
 }

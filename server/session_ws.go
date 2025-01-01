@@ -119,7 +119,7 @@ type (
 
 type SessionParameters struct {
 	Node                    string                        // The node name
-	XPID                    evr.EvrId                     // The EchoVR ID
+	XPID                    evr.XPID                      // The EchoVR ID
 	DiscordID               string                        // The Discord ID
 	LoginSession            *atomic.Pointer[sessionWS]    // The login session
 	LobbySession            *atomic.Pointer[sessionWS]    // The match session
@@ -404,7 +404,7 @@ func (s *sessionWS) Secondary(loginSession *sessionWS, isLobby bool, isServer bo
 
 	return s.SetIdentity(loginSession.UserID(), params.XPID, loginSession.Username())
 }
-func (s *sessionWS) SetIdentity(userID uuid.UUID, evrID evr.EvrId, username string) error {
+func (s *sessionWS) SetIdentity(userID uuid.UUID, evrID evr.XPID, username string) error {
 	// Each player has a single login connection, which will act as the core session.
 	// When this connection is terminated, all other connections should be terminated.
 

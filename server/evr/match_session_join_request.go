@@ -40,7 +40,7 @@ type LobbyJoinSessionRequest struct {
 	Flags            uint64
 	CrossPlayEnabled bool
 	SessionSettings  LobbySessionSettings
-	OtherEvrID       EvrId
+	OtherXPID        XPID
 	Entrants         []Entrant
 }
 
@@ -100,9 +100,9 @@ func (m *LobbyJoinSessionRequest) Stream(s *EasyStream) error {
 				return err
 			}
 			if m.Flags&Flags_ModerateUser != 0 {
-				// Parse the lobbyID as the OtherEvrID
-				m.OtherEvrID.PlatformCode = PlatformCode(uint64(m.LobbyID[3]))
-				m.OtherEvrID.AccountId = uint64(binary.LittleEndian.Uint64(m.LobbyID[8:]))
+				// Parse the lobbyID as the OtherXPID
+				m.OtherXPID.ProviderID.PlatformID = PlatformID(m.LobbyID[3])
+				m.OtherXPID.AccountID = AccountID(binary.LittleEndian.Uint64(m.LobbyID[8:]))
 				m.LobbyID = uuid.Nil
 			}
 			return nil
@@ -111,7 +111,7 @@ func (m *LobbyJoinSessionRequest) Stream(s *EasyStream) error {
 		func() error {
 			// Stream the entrants
 			for i := range m.Entrants {
-				if err := s.StreamStruct(&m.Entrants[i].EvrID); err != nil {
+				if err := s.StreamStruct(&m.Entrants[i].XPID); err != nil {
 					return err
 				}
 			}
@@ -139,11 +139,11 @@ func (m *LobbyJoinSessionRequest) GetLoginSessionID() uuid.UUID {
 	return m.LoginSessionID
 }
 
-func (m *LobbyJoinSessionRequest) GetEvrID() EvrId {
+func (m *LobbyJoinSessionRequest) GetXPID() XPID {
 	if len(m.Entrants) == 0 {
-		return EvrId{}
+		return XPID{}
 	}
-	return m.Entrants[0].EvrID
+	return m.Entrants[0].XPID
 }
 
 func (m *LobbyJoinSessionRequest) GetGroupID() uuid.UUID {

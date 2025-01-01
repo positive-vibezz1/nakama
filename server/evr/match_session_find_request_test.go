@@ -30,7 +30,7 @@ func TestLobbyFindSessionRequest_UnmarshalJSON(t *testing.T) {
 				0x61, 0x70, 0x70, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x31, 0x33, 0x36, 0x39, 0x30, 0x37, 0x38, 0x34,
 				0x30, 0x39, 0x38, 0x37, 0x33, 0x34, 0x30, 0x32, 0x22, 0x7d,
 				0x00,                                                                                           // Null terminator
-				0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0xa9, 0x53, 0x29, 0xef, 0x14, 0x0e, 0x00, // Entrant 0 EvrID
+				0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0xa9, 0x53, 0x29, 0xef, 0x14, 0x0e, 0x00, // Entrant 0 XPID
 
 			},
 			want: &LobbyFindSessionRequest{
@@ -48,10 +48,7 @@ func TestLobbyFindSessionRequest_UnmarshalJSON(t *testing.T) {
 				},
 				Entrants: []Entrant{
 					{
-						EvrID: EvrId{
-							PlatformCode: 4,
-							AccountId:    3963667097037078,
-						},
+						XPID: NewXPID(4, 3963667097037078),
 						Role: int8(TeamUnassigned),
 					},
 				},
@@ -90,10 +87,7 @@ func TestLobbyFindSessionRequest_UnmarshalJSON(t *testing.T) {
 				},
 				Entrants: []Entrant{
 					{
-						EvrID: EvrId{
-							PlatformCode: 4,
-							AccountId:    3963667097037078,
-						},
+						XPID: NewXPID(4, 3963667097037078),
 						Role: int8(TeamUnassigned),
 					},
 				},
@@ -139,10 +133,7 @@ func TestLobbyFindSessionRequest_UnmarshalJSON(t *testing.T) {
 				},
 				Entrants: []Entrant{
 					{
-						EvrID: EvrId{
-							PlatformCode: 7,
-							AccountId:    8582873777389537089,
-						},
+						XPID: NewXPID(7, 8582873777389537089),
 						Role: 2,
 					},
 				},

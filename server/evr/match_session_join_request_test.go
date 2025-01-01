@@ -46,8 +46,8 @@ func TestLobbyJoinSessionRequest(t *testing.T) {
 				},
 				Entrants: []Entrant{
 					{
-						EvrID: *lo.Must(ParseEvrId("OVR-ORG-3963667097037078")),
-						Role:  -1,
+						XPID: lo.Must(XPIDFromString("OVR-ORG-3963667097037078")),
+						Role: -1,
 					},
 				},
 			},
@@ -86,8 +86,8 @@ func TestLobbyJoinSessionRequest(t *testing.T) {
 				},
 				Entrants: []Entrant{
 					{
-						EvrID: *lo.Must(ParseEvrId("OVR_ORG-3963667097037078")),
-						Role:  4,
+						XPID: lo.Must(XPIDFromString("OVR_ORG-3963667097037078")),
+						Role: 4,
 					},
 				},
 			},
@@ -115,7 +115,7 @@ func TestLobbyJoinSessionRequest(t *testing.T) {
 				VersionLock:    -4166109104957845235,
 				Platform:       ToSymbol("OVR"),
 				LoginSessionID: uuid.Must(uuid.FromString("e7c16fb6-fbb7-11ee-b192-66d3ff8a653b")),
-				OtherEvrID:     *lo.Must(ParseEvrId("DMO-1")),
+				OtherXPID:      lo.Must(XPIDFromString("DMO-1")),
 				Flags:          11,
 				SessionSettings: LobbySessionSettings{
 					AppID: "1369078409873402",
@@ -124,8 +124,8 @@ func TestLobbyJoinSessionRequest(t *testing.T) {
 				},
 				Entrants: []Entrant{
 					{
-						EvrID: *lo.Must(ParseEvrId("OVR_ORG-3963667097037078")),
-						Role:  4,
+						XPID: lo.Must(XPIDFromString("OVR_ORG-3963667097037078")),
+						Role: 4,
 					},
 				},
 			},

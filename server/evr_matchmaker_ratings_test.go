@@ -257,7 +257,7 @@ func Test_updateProfileStats(t *testing.T) {
 }
 func TestCalculatePlayerRating(t *testing.T) {
 	type args struct {
-		evrID    evr.EvrId
+		xpID     evr.XPID
 		players  []PlayerInfo
 		blueWins bool
 	}
@@ -269,35 +269,32 @@ func TestCalculatePlayerRating(t *testing.T) {
 		{
 			name: "Player in blue team, blue wins",
 			args: args{
-				evrID: evr.EvrId{
-					PlatformCode: 4,
-					AccountId:    123456789,
-				},
+				xpID: evr.NewXPID(4, 123456789),
 				players: []PlayerInfo{
 
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 987654321},
+						XPID:        evr.NewXPID(4, 987654321),
 						Team:        0,
 						RatingMu:    30,
 						RatingSigma: 7.5,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 123456789},
+						XPID:        evr.NewXPID(4, 123456789),
 						Team:        0,
 						RatingMu:    19,
 						RatingSigma: 4.333,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 112233445},
+						XPID:        evr.NewXPID(4, 112233445),
 						Team:        1,
 						RatingMu:    20,
 						RatingSigma: 6.666,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 556677889},
+						XPID:        evr.NewXPID(4, 556677889),
 						Team:        1,
 						RatingMu:    22,
 						RatingSigma: 7.0,
@@ -311,34 +308,32 @@ func TestCalculatePlayerRating(t *testing.T) {
 		{
 			name: "Player in orange team, orange wins",
 			args: args{
-				evrID: evr.EvrId{
-					PlatformCode: 4,
-					AccountId:    123456789,
-				},
+				xpID: evr.NewXPID(4, 123456789),
+
 				players: []PlayerInfo{
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 112233445},
+						XPID:        evr.NewXPID(4, 112233445),
 						Team:        0,
 						RatingMu:    20,
 						RatingSigma: 6.666,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 556677889},
+						XPID:        evr.NewXPID(4, 556677889),
 						Team:        0,
 						RatingMu:    22,
 						RatingSigma: 7.0,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 987654321},
+						XPID:        evr.NewXPID(4, 987654321),
 						Team:        1,
 						RatingMu:    30,
 						RatingSigma: 7.5,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 123456789},
+						XPID:        evr.NewXPID(4, 123456789),
 						Team:        1,
 						RatingMu:    19,
 						RatingSigma: 4.333,
@@ -352,34 +347,31 @@ func TestCalculatePlayerRating(t *testing.T) {
 		{
 			name: "Player in blue team, orange wins",
 			args: args{
-				evrID: evr.EvrId{
-					PlatformCode: 4,
-					AccountId:    123456789,
-				},
+				xpID: evr.NewXPID(4, 123456789),
 				players: []PlayerInfo{
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 123456789},
+						XPID:        evr.NewXPID(4, 123456789),
 						Team:        0,
 						RatingMu:    12,
 						RatingSigma: 8.333,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 987654321},
+						XPID:        evr.NewXPID(4, 987654321),
 						Team:        0,
 						RatingMu:    30,
 						RatingSigma: 7.5,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 112233445},
+						XPID:        evr.NewXPID(4, 112233445),
 						Team:        1,
 						RatingMu:    20,
 						RatingSigma: 6.666,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 556677889},
+						XPID:        evr.NewXPID(4, 556677889),
 						Team:        1,
 						RatingMu:    22,
 						RatingSigma: 7.0,
@@ -393,34 +385,31 @@ func TestCalculatePlayerRating(t *testing.T) {
 		{
 			name: "Player in orange team, blue wins",
 			args: args{
-				evrID: evr.EvrId{
-					PlatformCode: 4,
-					AccountId:    112233445,
-				},
+				xpID: evr.NewXPID(4, 112233445),
 				players: []PlayerInfo{
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 987654321},
+						XPID:        evr.NewXPID(4, 987654321),
 						Team:        0,
 						RatingMu:    30,
 						RatingSigma: 7.5,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 123456789},
+						XPID:        evr.NewXPID(4, 123456789),
 						Team:        0,
 						RatingMu:    12,
 						RatingSigma: 8.333,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 112233445},
+						XPID:        evr.NewXPID(4, 112233445),
 						Team:        1,
 						RatingMu:    20,
 						RatingSigma: 6.666,
 						JoinTime:    0.0,
 					},
 					{
-						EvrID:       evr.EvrId{PlatformCode: 4, AccountId: 556677889},
+						XPID:        evr.NewXPID(4, 556677889),
 						Team:        1,
 						RatingMu:    22,
 						RatingSigma: 7.0,
@@ -434,7 +423,7 @@ func TestCalculatePlayerRating(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := CalculateNewPlayerRating(tt.args.evrID, tt.args.players, 4, tt.args.blueWins); reflect.DeepEqual(got, tt.want) {
+			if got, _ := CalculateNewPlayerRating(tt.args.xpID, tt.args.players, 4, tt.args.blueWins); reflect.DeepEqual(got, tt.want) {
 				t.Errorf("calculatePlayerRating() = %v, want %v", got, tt.want)
 			}
 		})

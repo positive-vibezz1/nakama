@@ -33,10 +33,7 @@ func TestNewSessionParametersFromLobbySessionRequest(t *testing.T) {
 		},
 		Entrants: []evr.Entrant{
 			{
-				EvrID: evr.EvrId{
-					PlatformCode: 4,
-					AccountId:    3963667097037078,
-				},
+				XPID: evr.NewXPID(4, 3963667097037078),
 				Role: int8(evr.TeamUnassigned),
 			},
 		},

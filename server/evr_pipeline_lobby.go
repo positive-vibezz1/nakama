@@ -208,8 +208,8 @@ func (p *EvrPipeline) lobbyPlayerSessionsRequest(ctx context.Context, logger *za
 		return fmt.Errorf("failed to get lobby presence for entrant `%s`: %w", entrantID.String(), err)
 	}
 
-	entrantIDs := make([]uuid.UUID, len(message.PlayerEvrIDs))
-	for i, e := range message.PlayerEvrIDs {
+	entrantIDs := make([]uuid.UUID, len(message.PlayerXPIDs))
+	for i, e := range message.PlayerXPIDs {
 		entrantIDs[i] = NewEntrantID(matchID, e)
 	}
 

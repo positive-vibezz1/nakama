@@ -10,8 +10,8 @@ import (
 
 func TestEvrId_UUID(t *testing.T) {
 	type fields struct {
-		PlatformCode PlatformCode
-		AccountId    uint64
+		PlatformCode PlatformID
+		AccountId    AccountID
 	}
 	tests := []struct {
 		name   string
@@ -45,10 +45,7 @@ func TestEvrId_UUID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			xpi := &EvrId{
-				PlatformCode: tt.fields.PlatformCode,
-				AccountId:    tt.fields.AccountId,
-			}
+			xpi := NewXPID(tt.fields.PlatformCode, tt.fields.AccountId)
 			if got := xpi.UUID(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("EvrId.UUID = %v, want %v", got, tt.want)
 			}
@@ -58,27 +55,21 @@ func TestEvrId_UUID(t *testing.T) {
 
 func TestEvrId_Equal(t *testing.T) {
 
-	evrID1 := EvrId{
-		PlatformCode: 1,
-		AccountId:    1,
-	}
-	evrID2 := EvrId{
-		PlatformCode: 1,
-		AccountId:    1,
-	}
+	xpID1 := NewXPID(1, 1)
+	xpID2 := NewXPID(1, 1)
 
-	if evrID1 != evrID2 {
-		t.Errorf("EvrId.Equal() = %v, want %v", evrID1, evrID2)
+	if xpID1 != xpID2 {
+		t.Errorf("EvrId.Equal() = %v, want %v", xpID1, xpID2)
 	}
 }
 
 func TestEvrId_Equals(t *testing.T) {
 	type fields struct {
-		PlatformCode PlatformCode
-		AccountId    uint64
+		PlatformCode PlatformID
+		AccountId    AccountID
 	}
 	type args struct {
-		other EvrId
+		other XPID
 	}
 	tests := []struct {
 		name   string
@@ -93,10 +84,7 @@ func TestEvrId_Equals(t *testing.T) {
 				AccountId:    1,
 			},
 			args: args{
-				EvrId{
-					PlatformCode: 1,
-					AccountId:    1,
-				},
+				NewXPID(1, 1),
 			},
 			want: true,
 		},
@@ -107,10 +95,7 @@ func TestEvrId_Equals(t *testing.T) {
 				AccountId:    1,
 			},
 			args: args{
-				EvrId{
-					PlatformCode: 1,
-					AccountId:    1,
-				},
+				NewXPID(1, 1),
 			},
 			want: false,
 		},
@@ -121,10 +106,7 @@ func TestEvrId_Equals(t *testing.T) {
 				AccountId:    0,
 			},
 			args: args{
-				EvrId{
-					PlatformCode: 1,
-					AccountId:    1,
-				},
+				NewXPID(1, 1),
 			},
 			want: false,
 		},
@@ -135,21 +117,15 @@ func TestEvrId_Equals(t *testing.T) {
 				AccountId:    1,
 			},
 			args: args{
-				EvrId{
-					PlatformCode: 2,
-					AccountId:    2,
-				},
+				NewXPID(2, 2),
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			xpi := &EvrId{
-				PlatformCode: tt.fields.PlatformCode,
-				AccountId:    tt.fields.AccountId,
-			}
-			if got := xpi.Equals(tt.args.other); got != tt.want {
+			xpi := NewXPID(tt.fields.PlatformCode, tt.fields.AccountId)
+			if got := xpi == tt.args.other; got != tt.want {
 				t.Errorf("EvrId.Equals() = %v, want %v", got, tt.want)
 			}
 		})
@@ -158,8 +134,8 @@ func TestEvrId_Equals(t *testing.T) {
 
 func TestEvrId_IsNil(t *testing.T) {
 	type fields struct {
-		PlatformCode PlatformCode
-		AccountId    uint64
+		PlatformCode PlatformID
+		AccountId    AccountID
 	}
 	tests := []struct {
 		name   string
@@ -201,10 +177,7 @@ func TestEvrId_IsNil(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			xpi := &EvrId{
-				PlatformCode: tt.fields.PlatformCode,
-				AccountId:    tt.fields.AccountId,
-			}
+			xpi := NewXPID(tt.fields.PlatformCode, tt.fields.AccountId)
 			if got := xpi.IsNil(); got != tt.want {
 				t.Errorf("EvrId.IsNil() = %v, want %v", got, tt.want)
 			}
@@ -214,8 +187,8 @@ func TestEvrId_IsNil(t *testing.T) {
 
 func TestEvrId_MarshalText(t *testing.T) {
 	type fields struct {
-		PlatformCode PlatformCode
-		AccountId    uint64
+		PlatformCode PlatformID
+		AccountId    AccountID
 	}
 	tests := []struct {
 		name    string
@@ -262,10 +235,7 @@ func TestEvrId_MarshalText(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := EvrId{
-				PlatformCode: tt.fields.PlatformCode,
-				AccountId:    tt.fields.AccountId,
-			}
+			e := NewXPID(tt.fields.PlatformCode, tt.fields.AccountId)
 			got, err := e.MarshalText()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EvrId.MarshalText() error = %v, wantErr %v", err, tt.wantErr)
@@ -280,8 +250,8 @@ func TestEvrId_MarshalText(t *testing.T) {
 
 func TestEvrId_UnmarshalJSON(t *testing.T) {
 	type fields struct {
-		PlatformCode PlatformCode
-		AccountId    uint64
+		PlatformCode PlatformID
+		AccountId    AccountID
 	}
 	type args struct {
 		b []byte
@@ -339,10 +309,7 @@ func TestEvrId_UnmarshalJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &EvrId{
-				PlatformCode: tt.fields.PlatformCode,
-				AccountId:    tt.fields.AccountId,
-			}
+			e := NewXPID(tt.fields.PlatformCode, tt.fields.AccountId)
 			if err := json.Unmarshal(tt.args.b, e); (err != nil) != tt.wantErr {
 				t.Errorf("EvrId.UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -350,14 +317,14 @@ func TestEvrId_UnmarshalJSON(t *testing.T) {
 	}
 }
 
-func TestParseEvrId(t *testing.T) {
+func TestXPIDFromString(t *testing.T) {
 	type args struct {
 		s string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *EvrId
+		want    XPID
 		wantErr bool
 	}{
 		{
@@ -365,10 +332,7 @@ func TestParseEvrId(t *testing.T) {
 			args: args{
 				s: "STM-1",
 			},
-			want: &EvrId{
-				PlatformCode: 1,
-				AccountId:    1,
-			},
+			want:    NewXPID(1, 1),
 			wantErr: false,
 		},
 		{
@@ -376,10 +340,7 @@ func TestParseEvrId(t *testing.T) {
 			args: args{
 				s: "UNK-1",
 			},
-			want: &EvrId{
-				PlatformCode: 0,
-				AccountId:    1,
-			},
+			want:    NewXPID(0, 1),
 			wantErr: false,
 		},
 		{
@@ -387,10 +348,7 @@ func TestParseEvrId(t *testing.T) {
 			args: args{
 				s: "STM-0",
 			},
-			want: &EvrId{
-				PlatformCode: 1,
-				AccountId:    0,
-			},
+			want:    NewXPID(1, 0),
 			wantErr: false,
 		},
 		{
@@ -398,10 +356,7 @@ func TestParseEvrId(t *testing.T) {
 			args: args{
 				s: "OVR_ORG-3963667097037078",
 			},
-			want: &EvrId{
-				PlatformCode: 4,
-				AccountId:    3963667097037078,
-			},
+			want:    NewXPID(4, 3963667097037078),
 			wantErr: false,
 		},
 		{
@@ -409,22 +364,19 @@ func TestParseEvrId(t *testing.T) {
 			args: args{
 				s: "OVR-ORG-3963667097037078",
 			},
-			want: &EvrId{
-				PlatformCode: 4,
-				AccountId:    3963667097037078,
-			},
+			want:    NewXPID(4, 3963667097037078),
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseEvrId(tt.args.s)
+			got, err := XPIDFromString(tt.args.s)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ParseEvrId() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("XPIDFromString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ParseEvrId() = %v, want %v", got, tt.want)
+				t.Errorf("XPIDFromString() = %v, want %v", got, tt.want)
 			}
 		})
 	}

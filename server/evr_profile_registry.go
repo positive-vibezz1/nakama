@@ -34,7 +34,7 @@ type ProfileRegistry struct {
 	unlocksByItemName map[string]string
 
 	cacheMu sync.RWMutex
-	cache   map[evr.EvrId]*json.RawMessage
+	cache   map[evr.XPID]*json.RawMessage
 	// Load out default items
 	defaults map[string]string
 }
@@ -53,7 +53,7 @@ func NewProfileRegistry(nk runtime.NakamaModule, db *sql.DB, logger runtime.Logg
 		tracker:     tracker,
 		metrics:     metrics,
 
-		cache: make(map[evr.EvrId]*json.RawMessage),
+		cache: make(map[evr.XPID]*json.RawMessage),
 
 		unlocksByItemName: unlocksByFieldName,
 		defaults:          generateDefaultLoadoutMap(),
@@ -151,7 +151,7 @@ func (r *ProfileRegistry) Save(ctx context.Context, userID uuid.UUID, profile Ga
 
 	// Purge the cache
 	r.cacheMu.Lock()
-	delete(r.cache, profile.GetEvrID())
+	delete(r.cache, profile.GetXPID())
 	r.cacheMu.Unlock()
 
 	return err
@@ -190,27 +190,27 @@ func (r *ProfileRegistry) SaveAndCache(ctx context.Context, userID uuid.UUID, pr
 	}
 
 	r.cacheMu.Lock()
-	r.cache[serverProfile.EvrID] = &data
+	r.cache[serverProfile.XPID] = &data
 	defer r.cacheMu.Unlock()
 
 	return err
 }
 
 // Retrieves the bytes of a server profile from the cache.
-func (s *ProfileRegistry) GetCached(ctx context.Context, evrID evr.EvrId) (*json.RawMessage, error) {
+func (s *ProfileRegistry) GetCached(ctx context.Context, xpID evr.XPID) (*json.RawMessage, error) {
 	s.cacheMu.RLock()
-	if data, ok := s.cache[evrID]; ok {
+	if data, ok := s.cache[xpID]; ok {
 		s.cacheMu.RUnlock()
 		return data, nil
 	}
 	s.cacheMu.RUnlock()
 
-	_, data, err := StorageReadEVRProfileByXPI(ctx, s.db, evrID)
+	_, data, err := StorageReadEVRProfileByXPI(ctx, s.db, xpID)
 	if err != nil {
 		return nil, err
 	}
 	s.cacheMu.Lock()
-	s.cache[evrID] = &data
+	s.cache[xpID] = &data
 	s.cacheMu.Unlock()
 
 	return &data, err
@@ -281,14 +281,14 @@ func (r *ProfileRegistry) ValidateArenaUnlockByName(i interface{}, itemName stri
 	return false, fmt.Errorf("unknown unlock field name: %s", fieldName)
 }
 
-func (r *ProfileRegistry) GameProfile(ctx context.Context, logger *zap.Logger, userID uuid.UUID, loginProfile evr.LoginProfile, evrID evr.EvrId) (*GameProfileData, error) {
-	logger = logger.With(zap.String("evrid", evrID.String()))
+func (r *ProfileRegistry) GameProfile(ctx context.Context, logger *zap.Logger, userID uuid.UUID, loginProfile evr.LoginProfile, xpID evr.XPID) (*GameProfileData, error) {
+	logger = logger.With(zap.String("xp_id", xpID.String()))
 
 	p, err := r.Load(ctx, userID)
 	if err != nil {
 		return p, fmt.Errorf("failed to load user profile: %w", err)
 	}
-	p.SetEvrID(evrID)
+	p.SetXPID(xpID)
 	p.SetLogin(loginProfile)
 	p.Server.PublisherLock = p.Login.PublisherLock
 	p.Server.LobbyVersion = p.Login.LobbyVersion
@@ -328,7 +328,7 @@ func (r *ProfileRegistry) UpdateClientProfile(ctx context.Context, logger *zap.L
 }
 
 // A fast lookup of existing profile data
-func StorageReadEVRProfileByXPI(ctx context.Context, db *sql.DB, evrID evr.EvrId) (string, json.RawMessage, error) {
+func StorageReadEVRProfileByXPI(ctx context.Context, db *sql.DB, xpID evr.XPID) (string, json.RawMessage, error) {
 	query := `
 	SELECT 
 		s.user_id, s.value->>'server' 
@@ -343,7 +343,7 @@ func StorageReadEVRProfileByXPI(ctx context.Context, db *sql.DB, evrID evr.EvrId
 	var dbUserID string
 	var dbServerProfile string
 	var found = true
-	if err := db.QueryRowContext(ctx, query, GameProfileStorageCollection, GameProfileStorageKey, evrID.String()).Scan(&dbUserID, &dbServerProfile); err != nil {
+	if err := db.QueryRowContext(ctx, query, GameProfileStorageCollection, GameProfileStorageKey, xpID.String()).Scan(&dbUserID, &dbServerProfile); err != nil {
 		if err == sql.ErrNoRows {
 			found = false
 		} else {
@@ -356,13 +356,13 @@ func StorageReadEVRProfileByXPI(ctx context.Context, db *sql.DB, evrID evr.EvrId
 	return dbUserID, json.RawMessage(dbServerProfile), nil
 }
 
-func (p *ProfileRegistry) SetLobbyProfile(ctx context.Context, userID uuid.UUID, evrID evr.EvrId, displayName string) error {
+func (p *ProfileRegistry) SetLobbyProfile(ctx context.Context, userID uuid.UUID, xpID evr.XPID, displayName string) error {
 	profile, err := p.Load(ctx, userID)
 	if err != nil {
 		return fmt.Errorf("failed to load profile: %w", err)
 	}
 
-	profile.SetEvrID(evrID)
+	profile.SetXPID(xpID)
 	profile.UpdateDisplayName(displayName)
 
 	err = p.SaveAndCache(ctx, userID, profile)

@@ -200,11 +200,6 @@ func ToSymbol(v any) Symbol {
 	}
 }
 
-// Message is a Evr message that can be sent over the network.
-type Message interface {
-	Stream(s *EasyStream) error
-}
-
 // Marshal returns the wire-format encoding of multiple messages.
 func Marshal(msgs ...Message) ([]byte, error) {
 	var errs error

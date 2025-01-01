@@ -18,7 +18,7 @@ const (
 )
 
 type RemoteLogSet struct {
-	EvrID    EvrId
+	XPID     XPID
 	Unk0     uint64
 	Unk1     uint64
 	Unk2     uint64
@@ -28,13 +28,12 @@ type RemoteLogSet struct {
 }
 
 func (m RemoteLogSet) String() string {
-	return fmt.Sprintf("%T{evr_id=%s,log_level=%d, num_logs=%d}", m, m.EvrID.String(), m.LogLevel, len(m.Logs))
+	return fmt.Sprintf("%T{xp_id=%s,log_level=%d, num_logs=%d}", m, m.XPID.String(), m.LogLevel, len(m.Logs))
 }
 
 func (m *RemoteLogSet) Stream(s *EasyStream) error {
 	return RunErrorFunctions([]func() error{
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.EvrID.PlatformCode) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.EvrID.AccountId) },
+		func() error { return s.StreamStruct(&m.XPID) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.Unk0) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.Unk1) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.Unk2) },

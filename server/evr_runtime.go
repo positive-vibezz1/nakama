@@ -836,11 +836,11 @@ func GetAccountMetadata(ctx context.Context, nk runtime.NakamaModule, userID str
 	return md, nil
 }
 
-func GetUserIDByEvrID(ctx context.Context, db *sql.DB, evrID string) (string, error) {
+func GetUserIDByXPID(ctx context.Context, db *sql.DB, xpID string) (string, error) {
 	query := "SELECT user_id FROM storage s WHERE collection = $1 AND key = $2 AND s.value->'server'->>'xplatformid' = $3 ORDER BY update_time DESC LIMIT 1"
 	var dbUserID string
 	var found = true
-	err := db.QueryRowContext(ctx, query, GameProfileStorageCollection, GameProfileStorageKey, evrID).Scan(&dbUserID)
+	err := db.QueryRowContext(ctx, query, GameProfileStorageCollection, GameProfileStorageKey, xpID).Scan(&dbUserID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			found = false

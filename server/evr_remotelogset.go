@@ -93,7 +93,7 @@ OuterLoop:
 	return entries
 }
 
-func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logger, session *sessionWS, evrID evr.EvrId, request *evr.RemoteLogSet) error {
+func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logger, session *sessionWS, xpID evr.XPID, request *evr.RemoteLogSet) error {
 
 	// Add the raw logs to the journal.
 	if !session.id.IsNil() {
@@ -132,7 +132,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 		switch msg := e.Parsed.(type) {
 
 		case *evr.RemoteLogDisconnectedDueToTimeout:
-			logger.Warn("Disconnected due to timeout", zap.String("username", session.Username()), zap.String("evr_id", evrID.String()), zap.Any("remote_log_message", msg))
+			logger.Warn("Disconnected due to timeout", zap.String("username", session.Username()), zap.String("xp_id", xpID.String()), zap.Any("remote_log_message", msg))
 
 		case *evr.RemoteLogUserDisconnected:
 
@@ -158,7 +158,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 				continue
 			}
 
-			userID, err := GetUserIDByEvrID(ctx, p.db, msg.PlayerEvrID)
+			userID, err := GetUserIDByXPID(ctx, p.db, msg.PlayerXPID)
 			if err != nil || userID == "" {
 				logger.Error("Failed to get user ID by evr ID", zap.Error(err))
 				continue
@@ -172,7 +172,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 
 			var username string
 			for _, player := range label.Players {
-				if player.EvrID.String() == msg.PlayerEvrID {
+				if player.XPID.String() == msg.PlayerXPID {
 					username = player.Username
 					break
 				}
@@ -245,7 +245,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 			if err != nil {
 				return fmt.Errorf("failed to load player's profile: %w", err)
 			}
-			profile.SetEvrID(evrID)
+			profile.SetXPID(xpID)
 			if err := p.profileRegistry.UpdateEquippedItem(profile, category, name); err != nil {
 				return fmt.Errorf("failed to update equipped item: %w", err)
 			}
@@ -292,7 +292,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 				ClientUserID     string     `json:"client_user_id"`
 				ClientUsername   string     `json:"client_username"`
 				ClientDiscordID  string     `json:"client_discord_id"`
-				ClientEvrID      evr.EvrId  `json:"client_evr_id"`
+				ClientXPID       evr.XPID   `json:"client_xp_id"`
 				ClientIsPCVR     bool       `json:"client_is_pcvr"`
 				RemoteLogMessage string     `json:"remote_log_message"`
 			}{
@@ -306,7 +306,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 				ClientUserID:     session.userID.String(),
 				ClientUsername:   session.Username(),
 				ClientDiscordID:  params.DiscordID,
-				ClientEvrID:      params.XPID,
+				ClientXPID:       params.XPID,
 				RemoteLogMessage: string(msgData),
 			}
 			// Check if the match's group wants audit messages
@@ -316,7 +316,7 @@ func (p *EvrPipeline) processRemoteLogSets(ctx context.Context, logger *zap.Logg
 			}
 			p.appBot.LogUserErrorMessage(ctx, label.GetGroupID().String(), fmt.Sprintf("```json\n%s\n```", string(contentData)), false)
 
-			logger.Warn("Server connection failed", zap.String("username", session.Username()), zap.String("match_id", msg.SessionUUID().String()), zap.String("evr_id", evrID.String()), zap.Any("remote_log_message", msg))
+			logger.Warn("Server connection failed", zap.String("username", session.Username()), zap.String("match_id", msg.SessionUUID().String()), zap.String("xp_id", xpID.String()), zap.Any("remote_log_message", msg))
 
 			acct, err := p.runtimeModule.AccountGetId(ctx, label.Broadcaster.OperatorID)
 			if err != nil {
@@ -387,10 +387,10 @@ func (u *MatchGameStateUpdate) FromGoal(goal *evr.RemoteLogGoal) {
 		GoalType:              goal.GoalType,
 		Displayname:           goal.PlayerInfoDisplayName,
 		Teamid:                goal.PlayerInfoTeamID,
-		EvrID:                 goal.PlayerInfoEvrID,
+		XPID:                  goal.PlayerInfoXPID,
 		PrevPlayerDisplayName: goal.PrevPlayerDisplayname,
 		PrevPlayerTeamID:      goal.PrevPlayerTeamID,
-		PrevPlayerEvrID:       goal.PrevPlayerEvrID,
+		PrevPlayerXPID:        goal.PrevPlayerXPID,
 		WasHeadbutt:           goal.WasHeadbutt,
 	})
 }

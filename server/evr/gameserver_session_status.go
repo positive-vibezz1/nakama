@@ -19,13 +19,13 @@ func (m *EchoToolsLobbySessionDataV1) Stream(s *EasyStream) error {
 }
 
 type EntrantData struct {
-	XPlatformId EvrId
-	TeamIndex   uint16
-	Ping        uint16
+	XPID      XPID
+	TeamIndex uint16
+	Ping      uint16
 }
 
 func (m *EntrantData) String() string {
-	return fmt.Sprintf("%T(%v, %d, %d)", m, m.XPlatformId, m.TeamIndex, m.Ping)
+	return fmt.Sprintf("%T(%v, %d, %d)", m, m.XPID, m.TeamIndex, m.Ping)
 }
 
 func (m *EntrantData) SizeOf() int {
@@ -34,8 +34,7 @@ func (m *EntrantData) SizeOf() int {
 
 func (m *EntrantData) Stream(s *EasyStream) error {
 	return RunErrorFunctions([]func() error{
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.XPlatformId.AccountId) },
-		func() error { return s.StreamNumber(binary.LittleEndian, &m.XPlatformId.PlatformCode) },
+		func() error { return s.StreamStruct(&m.XPID) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.TeamIndex) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.Ping) },
 	})

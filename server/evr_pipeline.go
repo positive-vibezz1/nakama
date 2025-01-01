@@ -482,8 +482,8 @@ func (p *EvrPipeline) ProcessRequestEVR(logger *zap.Logger, session *sessionWS, 
 				return false
 			}
 
-			if !params.XPID.Equals(xpimessage.GetEvrID()) {
-				logger.Error("mismatched evr id", zap.String("evrid", xpimessage.GetEvrID().String()), zap.String("evrid2", params.XPID.String()))
+			if params.XPID != xpimessage.GetXPID() {
+				logger.Error("mismatched evr id", zap.String("xp_id", xpimessage.GetXPID().String()), zap.String("xp_id2", params.XPID.String()))
 				return false
 			}
 		}
@@ -504,7 +504,7 @@ func (p *EvrPipeline) ProcessRequestEVR(logger *zap.Logger, session *sessionWS, 
 	}
 
 	if params, ok := LoadParams(session.Context()); ok && !params.XPID.IsNil() {
-		logger = logger.With(zap.String("uid", session.UserID().String()), zap.String("sid", session.ID().String()), zap.String("username", session.Username()), zap.String("evrid", params.XPID.String()))
+		logger = logger.With(zap.String("uid", session.UserID().String()), zap.String("sid", session.ID().String()), zap.String("username", session.Username()), zap.String("xp_id", params.XPID.String()))
 	}
 
 	if err := pipelineFn(session.Context(), logger, session, in); err != nil {

@@ -11,17 +11,17 @@ type GenericMessage struct {
 	Session     uuid.UUID
 	AcctId      uint64
 	MessageType Symbol
-	OtherEvrID  EvrId
+	OtherXPID   XPID
 	RoomID      int64
 	PartyData   GenericMessageData
 }
 
-func NewGenericMessage(session uuid.UUID, acctId uint64, messageType Symbol, otherEvrId EvrId, partyData GenericMessageData) *GenericMessage {
+func NewGenericMessage(session uuid.UUID, acctId uint64, messageType Symbol, otherEvrId XPID, partyData GenericMessageData) *GenericMessage {
 	return &GenericMessage{
 		Session:     session,
 		AcctId:      acctId,
 		MessageType: messageType,
-		OtherEvrID:  otherEvrId,
+		OtherXPID:   otherEvrId,
 		PartyData:   partyData,
 	}
 }
@@ -39,7 +39,7 @@ func (m *GenericMessage) Stream(s *EasyStream) error {
 		func() error { return s.StreamGUID(&m.Session) },
 		func() error { return s.StreamNumber(binary.LittleEndian, &m.AcctId) },
 		func() error { return s.StreamSymbol(&m.MessageType) },
-		func() error { return s.StreamStruct(&m.OtherEvrID) },
+		func() error { return s.StreamStruct(&m.OtherXPID) },
 		func() error {
 			// ovr_social_member_data_nack
 			if m.MessageType == 0xb9ea35ff8448e615 {
@@ -56,7 +56,7 @@ func (m *GenericMessage) GetLoginSessionID() uuid.UUID {
 }
 
 func (m GenericMessage) String() string {
-	return fmt.Sprintf("GenericMessage{Session: %s, AcctId: %d, OVRSymbol: %d, OtherEvrId: %s, RoomId: %d, PartyData: %v}", m.Session, m.AcctId, m.MessageType, m.OtherEvrID.Token(), m.RoomID, m.PartyData)
+	return fmt.Sprintf("GenericMessage{Session: %s, AcctId: %d, OVRSymbol: %d, OtherEvrId: %s, RoomId: %d, PartyData: %v}", m.Session, m.AcctId, m.MessageType, m.OtherXPID.Token(), m.RoomID, m.PartyData)
 }
 
 type GenericMessageData struct {

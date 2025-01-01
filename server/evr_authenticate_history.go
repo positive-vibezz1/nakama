@@ -38,7 +38,7 @@ var (
 
 type LoginHistoryEntry struct {
 	UpdatedAt time.Time         `json:"update_time"`
-	XPID      evr.EvrId         `json:"xpi"`
+	XPID      evr.XPID          `json:"xpi"`
 	ClientIP  string            `json:"client_ip"`
 	LoginData *evr.LoginProfile `json:"login_data"`
 }
@@ -59,7 +59,7 @@ func (h *LoginHistoryEntry) SystemProfile() string {
 
 type LoginHistory struct {
 	History          map[string]*LoginHistoryEntry `json:"history"` // map[deviceID]DeviceHistoryEntry
-	Cache            []string                      `json:"cache"`   // list of IP addresses, EvrID's, HMD Serial Numbers, and System Data
+	Cache            []string                      `json:"cache"`   // list of IP addresses, XPID's, HMD Serial Numbers, and System Data
 	XPIs             map[string]time.Time          `json:"xpis"`    // list of XPIs
 	ClientIPs        map[string]time.Time          `json:"client_ips"`
 	AuthorizedIPs    map[string]time.Time          `json:"authorized_ips"`
@@ -82,7 +82,7 @@ func NewLoginHistory() *LoginHistory {
 }
 
 // Returns true if the display name history was updated
-func (h *LoginHistory) Update(xpid evr.EvrId, clientIP string, loginData *evr.LoginProfile) {
+func (h *LoginHistory) Update(xpid evr.XPID, clientIP string, loginData *evr.LoginProfile) {
 	if h.History == nil {
 		h.History = make(map[string]*LoginHistoryEntry)
 	}
@@ -179,9 +179,9 @@ func (h *LoginHistory) rebuildCache() {
 		h.Cache = append(h.Cache, e.SystemProfile())
 
 		if !e.XPID.IsNil() {
-			evrIDStr := e.XPID.String()
-			if t, found := h.XPIs[evrIDStr]; !found || e.UpdatedAt.After(t) {
-				h.XPIs[evrIDStr] = e.UpdatedAt
+			xpIDStr := e.XPID.String()
+			if t, found := h.XPIs[xpIDStr]; !found || e.UpdatedAt.After(t) {
+				h.XPIs[xpIDStr] = e.UpdatedAt
 			}
 		}
 
@@ -287,7 +287,7 @@ func LoginHistoryStore(ctx context.Context, nk runtime.NakamaModule, userID stri
 	return nil
 }
 
-func LoginHistoryUpdate(ctx context.Context, nk runtime.NakamaModule, userID string, xpi evr.EvrId, clientIP string, loginData *evr.LoginProfile) error {
+func LoginHistoryUpdate(ctx context.Context, nk runtime.NakamaModule, userID string, xpi evr.XPID, clientIP string, loginData *evr.LoginProfile) error {
 	history, err := LoginHistoryLoad(ctx, nk, userID)
 	if err != nil {
 		return fmt.Errorf("error getting display name history: %w", err)

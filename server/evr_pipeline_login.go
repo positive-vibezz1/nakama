@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	XPIStorageIndex              = "EvrIDs_Index"
+	XPIStorageIndex              = "XPIDs_Index"
 	GameClientSettingsStorageKey = "clientSettings"
 	GamePlayerSettingsStorageKey = "playerSettings"
 	DocumentStorageCollection    = "GameDocuments"
@@ -32,13 +32,13 @@ const (
 )
 
 // errWithEvrIdFn prefixes an error with the EchoVR Id.
-func errWithEvrIdFn(evrId evr.EvrId, format string, a ...interface{}) error {
+func errWithEvrIdFn(evrId evr.XPID, format string, a ...interface{}) error {
 	return fmt.Errorf("%s: %w", evrId.Token(), fmt.Errorf(format, a...))
 }
 
 // msgFailedLoginFn sends a LoginFailure message to the client.
 // The error message is word-wrapped to 60 characters, 4 lines long.
-func msgFailedLoginFn(session *sessionWS, evrId evr.EvrId, err error) error {
+func msgFailedLoginFn(session *sessionWS, evrId evr.XPID, err error) error {
 	// Format the error message
 	s := fmt.Sprintf("%s: %s", evrId.Token(), err.Error())
 
@@ -96,7 +96,7 @@ func (p *EvrPipeline) processLogin(ctx context.Context, logger *zap.Logger, sess
 
 	// Providing a discord ID and password avoids the need to link the device to the account.
 	// Server Hosts use this method to authenticate.
-	xpid := request.GetEvrID()
+	xpid := request.GetXPID()
 
 	if xpid.IsNil() || !xpid.IsValid() {
 		return settings, fmt.Errorf("invalid xpid: %s", xpid.Token())
@@ -335,7 +335,7 @@ func (p *EvrPipeline) processLogin(ctx context.Context, logger *zap.Logger, sess
 	}
 	ctx = session.Context()
 
-	profile.SetEvrID(xpid)
+	profile.SetXPID(xpid)
 	profile.SetChannel(evr.GUID(metadata.GetActiveGroupID()))
 	profile.UpdateDisplayName(displayName)
 
@@ -354,13 +354,13 @@ func (p *EvrPipeline) processLogin(ctx context.Context, logger *zap.Logger, sess
 	return settings, nil
 }
 
-type EvrIDHistory struct {
+type XPIDHistory struct {
 	Created time.Time
 	Updated time.Time
 	UserID  uuid.UUID
 }
 
-func (p *EvrPipeline) authenticateHeadset(ctx context.Context, logger *zap.Logger, session *sessionWS, xpid evr.EvrId, clientIP string, userPassword string, payload evr.LoginProfile) (*api.Account, error) {
+func (p *EvrPipeline) authenticateHeadset(ctx context.Context, logger *zap.Logger, session *sessionWS, xpid evr.XPID, clientIP string, userPassword string, payload evr.LoginProfile) (*api.Account, error) {
 	var err error
 	var userId string
 	var account *api.Account
@@ -414,7 +414,7 @@ func (p *EvrPipeline) authenticateHeadset(ctx context.Context, logger *zap.Logge
 	return account, errors.New(msg)
 }
 
-func (p *EvrPipeline) validateDeviceID(ctx context.Context, logger *zap.Logger, session *sessionWS, xpid evr.EvrId) (*api.Account, error) {
+func (p *EvrPipeline) validateDeviceID(ctx context.Context, logger *zap.Logger, session *sessionWS, xpid evr.XPID) (*api.Account, error) {
 	// Validate the session login
 
 	// The account was found.
@@ -518,12 +518,12 @@ func (p *EvrPipeline) loggedInUserProfileRequest(ctx context.Context, logger *za
 
 	profile, err := p.profileRegistry.Load(ctx, session.userID)
 	if err != nil {
-		return session.SendEvr(evr.NewLoggedInUserProfileFailure(request.EvrID, 400, "failed to load game profiles"))
+		return session.SendEvr(evr.NewLoggedInUserProfileFailure(request.XPID, 400, "failed to load game profiles"))
 	}
 
 	profile.ExpireStatistics(2, 2)
 
-	profile.SetEvrID(request.EvrID)
+	profile.SetXPID(request.XPID)
 
 	guildGroups := params.GuildGroupsLoad()
 
@@ -537,14 +537,14 @@ func (p *EvrPipeline) loggedInUserProfileRequest(ctx context.Context, logger *za
 		profile.Client.Social.CommunityValuesVersion = 0
 	}
 
-	return session.SendEvr(evr.NewLoggedInUserProfileSuccess(request.EvrID, profile.Client, profile.Server))
+	return session.SendEvr(evr.NewLoggedInUserProfileSuccess(request.XPID, profile.Client, profile.Server))
 }
 
 func (p *EvrPipeline) updateClientProfileRequest(ctx context.Context, logger *zap.Logger, session *sessionWS, in evr.Message) error {
 	request := in.(*evr.UpdateClientProfile)
 
-	if !request.EvrId.Equals(request.ClientProfile.EvrID) {
-		return fmt.Errorf("xpi mismatch: %s != %s", request.ClientProfile.EvrID.Token(), request.EvrId.Token())
+	if request.EvrId != request.ClientProfile.XPID {
+		return fmt.Errorf("xpi mismatch: %s != %s", request.ClientProfile.XPID.Token(), request.EvrId.Token())
 	}
 
 	go func() {
@@ -559,9 +559,9 @@ func (p *EvrPipeline) updateClientProfileRequest(ctx context.Context, logger *za
 	return session.SendEvrUnrequire(evr.NewSNSUpdateProfileSuccess(&request.EvrId))
 }
 
-func (p *EvrPipeline) handleClientProfileUpdate(ctx context.Context, logger *zap.Logger, session *sessionWS, evrID evr.EvrId, update evr.ClientProfile) error {
+func (p *EvrPipeline) handleClientProfileUpdate(ctx context.Context, logger *zap.Logger, session *sessionWS, xpID evr.XPID, update evr.ClientProfile) error {
 	// Set the EVR ID from the context
-	update.EvrID = evrID
+	update.XPID = xpID
 
 	params, ok := LoadParams(ctx)
 	if !ok {
@@ -608,7 +608,7 @@ func (p *EvrPipeline) remoteLogSetv3(ctx context.Context, logger *zap.Logger, se
 	request := in.(*evr.RemoteLogSet)
 
 	go func() {
-		if err := p.processRemoteLogSets(ctx, logger, session, request.EvrID, request); err != nil {
+		if err := p.processRemoteLogSets(ctx, logger, session, request.XPID, request); err != nil {
 			logger.Error("Failed to process remote log set", zap.Error(err))
 		}
 	}()
@@ -823,7 +823,7 @@ func mostRecentThursday() time.Time {
 func (p *EvrPipeline) userServerProfileUpdateRequest(ctx context.Context, logger *zap.Logger, session *sessionWS, in evr.Message) error {
 	request := in.(*evr.UserServerProfileUpdateRequest)
 
-	if err := session.SendEvr(evr.NewUserServerProfileUpdateSuccess(request.EvrID)); err != nil {
+	if err := session.SendEvr(evr.NewUserServerProfileUpdateSuccess(request.XPID)); err != nil {
 		logger.Warn("Failed to send UserServerProfileUpdateSuccess", zap.Error(err))
 	}
 
@@ -838,7 +838,7 @@ func (p *EvrPipeline) userServerProfileUpdateRequest(ctx context.Context, logger
 		return fmt.Errorf("failed to get match label: %w", err)
 	}
 
-	playerInfo := label.GetPlayerByEvrID(request.EvrID)
+	playerInfo := label.GetPlayerByXPID(request.XPID)
 
 	if playerInfo == nil {
 		return fmt.Errorf("failed to find player in match")
@@ -885,7 +885,7 @@ func (p *EvrPipeline) userServerProfileUpdateRequest(ctx context.Context, logger
 
 	// Put the XP in the player's wallet
 
-	if rating, err := CalculateNewPlayerRating(request.EvrID, label.Players, label.TeamSize, blueWins); err != nil {
+	if rating, err := CalculateNewPlayerRating(request.XPID, label.Players, label.TeamSize, blueWins); err != nil {
 		logger.Error("Failed to calculate new player rating", zap.Error(err))
 	} else {
 		playerInfo.RatingMu = rating.Mu
@@ -936,7 +936,7 @@ func (p *EvrPipeline) otherUserProfileRequest(ctx context.Context, logger *zap.L
 				if label, err := MatchLabelByID(ctx, p.runtimeModule, matchID); err == nil && label != nil {
 
 					// Add asterisk if the player is backfill
-					if player := label.GetPlayerByEvrID(request.EvrId); player != nil {
+					if player := label.GetPlayerByXPID(request.EvrId); player != nil {
 						// If the player is backfill, add a note to the display name
 
 						if player.IsBackfill() {

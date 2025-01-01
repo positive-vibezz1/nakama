@@ -89,7 +89,7 @@ func TestGetSessionProfile(t *testing.T) {
 	}
 
 	// Create a test EVR ID
-	evrID, _ := evr.ParseEvrId("OVR_ORG-123412341234")
+	xpID, _ := evr.XPIDFromString("OVR_ORG-123412341234")
 
 	// Create a test context with the EVR ID
 	ctx := context.Background()
@@ -104,7 +104,7 @@ func TestGetSessionProfile(t *testing.T) {
 
 	// Call the GetSessionProfile method
 
-	p, err := profileRegistry.GameProfile(ctx, logger, session.userID, loginProfile, *evrID)
+	p, err := profileRegistry.GameProfile(ctx, logger, session.userID, loginProfile, xpID)
 	if err != nil {
 		t.Fatalf("GetSessionProfile returned an error: %v", err)
 	}
@@ -116,8 +116,8 @@ func TestGetSessionProfile(t *testing.T) {
 	if p.Server.LobbyVersion != 123456 {
 		t.Errorf("p.Server.LobbyVersion = %d, want %d", p.Server.LobbyVersion, 123456)
 	}
-	if p.Server.EvrID != *evrID {
-		t.Errorf("p.Server.EchoUserIdToken = %s, want %s", p.Server.EvrID.Token(), evrID.Token())
+	if p.Server.XPID != xpID {
+		t.Errorf("p.Server.EchoUserIdToken = %s, want %s", p.Server.XPID.Token(), xpID.Token())
 	}
 
 	if p.Server.CreateTime != time.Date(2023, 10, 31, 0, 0, 0, 0, time.UTC).Unix() {

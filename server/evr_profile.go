@@ -18,7 +18,7 @@ import (
 
 type GameProfile interface {
 	GetVersion() string
-	GetEvrID() evr.EvrId
+	GetXPID() evr.XPID
 	SetLogin(login evr.LoginProfile)
 	SetClient(client evr.ClientProfile)
 	SetServer(server evr.ServerProfile)
@@ -111,18 +111,18 @@ func (p *GameProfileData) SetRating(groupID uuid.UUID, mode evr.Symbol, rating t
 	p.SetStale()
 }
 
-func (p *GameProfileData) SetEvrID(evrID evr.EvrId) {
-	if p.Server.EvrID == evrID && p.Client.EvrID == evrID {
+func (p *GameProfileData) SetXPID(xpID evr.XPID) {
+	if p.Server.XPID == xpID && p.Client.XPID == xpID {
 		return
 	}
-	p.Server.EvrID = evrID
-	p.Client.EvrID = evrID
+	p.Server.XPID = xpID
+	p.Client.XPID = xpID
 	p.SetStale()
 
 }
 
-func (p *GameProfileData) GetEvrID() evr.EvrId {
-	return p.Server.EvrID
+func (p *GameProfileData) GetXPID() evr.XPID {
+	return p.Server.XPID
 }
 
 func (p *GameProfileData) GetChannel() uuid.UUID {

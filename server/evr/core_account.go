@@ -12,28 +12,8 @@ import (
 var (
 	validate *validator.Validate
 
-	EvrIdNil = EvrId{}
+	EvrIdNil = XPID{}
 )
-
-func ProfileValidator() *validator.Validate {
-	validate := validator.New()
-	validate.RegisterValidation("restricted", func(fl validator.FieldLevel) bool { return true })
-	validate.RegisterValidation("blocked", forceFalse)
-	validate.RegisterValidation("evrid", func(fl validator.FieldLevel) bool {
-		evrId, err := ParseEvrId(fl.Field().String())
-		if err != nil || evrId.Equals(EvrIdNil) {
-			return false
-		}
-		return true
-	})
-
-	return validate
-}
-
-func forceFalse(fl validator.FieldLevel) bool {
-	fl.Field().Set(reflect.ValueOf(false))
-	return true
-}
 
 // Profiles represents the 'profile' field in the JSON data
 type GameProfiles struct {
@@ -54,7 +34,7 @@ func (r *GameProfiles) Marshal() ([]byte, error) {
 type ClientProfile struct {
 	// WARNING: EchoVR dictates this struct/schema.
 	DisplayName string `json:"displayname,omitempty"` // Ignored and set by nakama
-	EvrID       EvrId  `json:"xplatformid,omitempty"` // Ignored and set by nakama
+	XPID        XPID   `json:"xplatformid,omitempty"` // Ignored and set by nakama
 
 	// The team name shown on the spectator scoreboard overlay
 	TeamName           string            `json:"teamname,omitempty" validate:"omitempty,ascii"`
@@ -109,7 +89,7 @@ func (c *ClientProfile) SetDefaults() error {
 
 func (c *ClientProfile) String() string {
 	return fmt.Sprintf("ClientProfile{DisplayName: %s, EchoUserIdToken: %s, TeamName: %s, CombatWeapon: %s, CombatGrenade: %s, CombatDominantHand: %d, ModifyTime: %d, CombatAbility: %s, LegalConsents: %v, MutedPlayers: %v, GhostedPlayers: %v, NewPlayerProgress: %v, Customization: %v, Social: %v, NewUnlocks: %v}",
-		c.DisplayName, c.EvrID.Token(), c.TeamName, c.CombatWeapon, c.CombatGrenade, c.CombatDominantHand, c.ModifyTime, c.CombatAbility, c.LegalConsents, c.MutedPlayers, c.GhostedPlayers, c.NewPlayerProgress, c.Customization, c.Social, c.NewUnlocks)
+		c.DisplayName, c.XPID.Token(), c.TeamName, c.CombatWeapon, c.CombatGrenade, c.CombatDominantHand, c.ModifyTime, c.CombatAbility, c.LegalConsents, c.MutedPlayers, c.GhostedPlayers, c.NewPlayerProgress, c.Customization, c.Social, c.NewUnlocks)
 }
 
 type Customization struct {
@@ -173,7 +153,7 @@ type PlayerStatistics map[string]map[string]MatchStatistic
 type ServerProfile struct {
 	// WARNING: EchoVR dictates this struct/schema.
 	DisplayName       string            `json:"displayname"`                                    // Overridden by nakama
-	EvrID             EvrId             `json:"xplatformid"`                                    // Overridden by nakama
+	XPID              XPID              `json:"xplatformid"`                                    // Overridden by nakama
 	SchemaVersion     int16             `json:"_version,omitempty" validate:"gte=0"`            // Version of the schema(?)
 	PublisherLock     string            `json:"publisher_lock,omitempty"`                       // unused atm
 	PurchasedCombat   int8              `json:"purchasedcombat,omitempty" validate:"eq=0|eq=1"` // unused (combat was made free)
@@ -193,8 +173,8 @@ type ServerProfile struct {
 }
 
 type DeveloperFeatures struct {
-	DisableAfkTimeout bool  `json:"disable_afk_timeout,omitempty"`
-	EvrIDOverride     EvrId `json:"xplatformid,omitempty"`
+	DisableAfkTimeout bool `json:"disable_afk_timeout,omitempty"`
+	XPIDOverride      XPID `json:"xplatformid,omitempty"`
 }
 
 type MatchStatistic struct {
@@ -1358,7 +1338,7 @@ func NewServerProfile() ServerProfile {
 				ChassisBodyS10A: true,
 			},
 		},
-		EvrID: EvrIdNil,
+		XPID: EvrIdNil,
 	}
 }
 
@@ -1420,11 +1400,11 @@ func NewClientProfile() ClientProfile {
 	}
 }
 
-func DefaultGameProfiles(evrID EvrId, displayname string) (GameProfiles, error) {
+func DefaultGameProfiles(xpID XPID, displayname string) (GameProfiles, error) {
 	client := NewClientProfile()
 	server := NewServerProfile()
-	client.EvrID = evrID
-	server.EvrID = evrID
+	client.XPID = xpID
+	server.XPID = xpID
 	client.DisplayName = displayname
 	server.DisplayName = displayname
 

@@ -7,7 +7,7 @@ import (
 var SNSUserServerProfileUpdateSuccessSymbol Symbol = ToSymbol("SNSUserServerProfileUpdateSuccess")
 
 type UserServerProfileUpdateSuccess struct {
-	EvrId EvrId
+	EvrId XPID
 }
 
 func (m *UserServerProfileUpdateSuccess) Token() string {
@@ -24,7 +24,7 @@ func (lr *UserServerProfileUpdateSuccess) String() string {
 func (m *UserServerProfileUpdateSuccess) Stream(s *EasyStream) error {
 	return s.StreamStruct(&m.EvrId)
 }
-func NewUserServerProfileUpdateSuccess(userId EvrId) *UserServerProfileUpdateSuccess {
+func NewUserServerProfileUpdateSuccess(userId XPID) *UserServerProfileUpdateSuccess {
 	return &UserServerProfileUpdateSuccess{
 		EvrId: userId,
 	}

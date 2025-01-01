@@ -14,7 +14,7 @@ type LoginIdentifier interface {
 
 type XPIdentifier interface {
 	LoginIdentifier
-	GetEvrID() EvrId
+	GetXPID() XPID
 }
 
 type LobbySessionMessage interface {
@@ -37,12 +37,12 @@ type LobbySessionRequest interface {
 }
 
 type Entrant struct {
-	EvrID EvrId
-	Role  int8 // -1 for any team
+	XPID XPID
+	Role int8 // -1 for any team
 }
 
 func (e Entrant) String() string {
-	return fmt.Sprintf("Entrant(evr_id=%s, role=%d)", e.EvrID, e.Role)
+	return fmt.Sprintf("Entrant(xp_id=%s, role=%d)", e.XPID, e.Role)
 }
 
 type GUID uuid.UUID

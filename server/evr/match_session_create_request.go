@@ -101,7 +101,7 @@ func (m *LobbyCreateSessionRequest) Stream(s *EasyStream) error {
 		func() error {
 			// Stream the entrants
 			for i := range m.Entrants {
-				if err := s.StreamStruct(&m.Entrants[i].EvrID); err != nil {
+				if err := s.StreamStruct(&m.Entrants[i].XPID); err != nil {
 					return err
 				}
 			}
@@ -148,11 +148,11 @@ func (m *LobbyCreateSessionRequest) GetLoginSessionID() uuid.UUID {
 	return m.LoginSessionID
 }
 
-func (m *LobbyCreateSessionRequest) GetEvrID() EvrId {
+func (m *LobbyCreateSessionRequest) GetXPID() XPID {
 	if len(m.Entrants) == 0 {
-		return EvrId{}
+		return XPID{}
 	}
-	return m.Entrants[0].EvrID
+	return m.Entrants[0].XPID
 }
 
 func (m *LobbyCreateSessionRequest) GetGroupID() uuid.UUID {

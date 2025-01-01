@@ -9,11 +9,11 @@ import (
 // It contains profile information about the requested user.
 type OtherUserProfileSuccess struct {
 	Message
-	EvrId             EvrId
+	EvrId             XPID
 	ServerProfileJSON *json.RawMessage
 }
 
-func NewOtherUserProfileSuccess(evrId EvrId, profile *ServerProfile) *OtherUserProfileSuccess {
+func NewOtherUserProfileSuccess(evrId XPID, profile *ServerProfile) *OtherUserProfileSuccess {
 	var data json.RawMessage
 	data, err := json.Marshal(profile)
 	if err != nil {

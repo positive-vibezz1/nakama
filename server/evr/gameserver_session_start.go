@@ -110,7 +110,7 @@ func (s *GameServerSessionStart) String() string {
 		s, s.MatchID, s.PlayerLimit, ToSymbol(s.Settings.Mode).Token(), ToSymbol(s.Settings.Level).Token())
 }
 
-func NewGameServerSessionStart(sessionID uuid.UUID, channel uuid.UUID, playerLimit uint8, lobbyType uint8, appID string, mode Symbol, level Symbol, features []string, entrants []EvrId) *GameServerSessionStart {
+func NewGameServerSessionStart(sessionID uuid.UUID, channel uuid.UUID, playerLimit uint8, lobbyType uint8, appID string, mode Symbol, level Symbol, features []string, entrants []XPID) *GameServerSessionStart {
 	descriptors := make([]EntrantDescriptor, len(entrants))
 	for i, entrant := range entrants {
 		descriptors[i] = *NewEntrantDescriptor(entrant)
@@ -191,18 +191,18 @@ func (s *LobbySessionSettings) String() string {
 
 type EntrantDescriptor struct {
 	Unk0  uuid.UUID
-	EvrID EvrId
+	XPID  XPID
 	Flags uint64
 }
 
 func (m *EntrantDescriptor) String() string {
-	return fmt.Sprintf("EREntrantDescriptor(unk0=%s, player_id=%s, flags=%d)", m.Unk0, m.EvrID.String(), m.Flags)
+	return fmt.Sprintf("EREntrantDescriptor(unk0=%s, player_id=%s, flags=%d)", m.Unk0, m.XPID.String(), m.Flags)
 }
 
-func NewEntrantDescriptor(playerId EvrId) *EntrantDescriptor {
+func NewEntrantDescriptor(playerId XPID) *EntrantDescriptor {
 	return &EntrantDescriptor{
 		Unk0:  uuid.Must(uuid.NewV4()),
-		EvrID: playerId,
+		XPID:  playerId,
 		Flags: 0x0044BB8000,
 	}
 }
@@ -211,7 +211,7 @@ func RandomBotEntrantDescriptor() EntrantDescriptor {
 	botuuid, _ := uuid.NewV4()
 	return EntrantDescriptor{
 		Unk0:  botuuid,
-		EvrID: EvrId{PlatformCode: BOT, AccountId: rand.Uint64()},
+		XPID:  NewXPIDWithUserType(BOT, BotUser, AccountID(rand.Uint64())),
 		Flags: 0x0044BB8000,
 	}
 }
@@ -234,7 +234,7 @@ func (m *GameServerSessionStart) Stream(s *EasyStream) error {
 			for _, entrant := range m.Entrants {
 				err := RunErrorFunctions([]func() error{
 					func() error { return s.StreamGUID(&entrant.Unk0) },
-					func() error { return s.StreamStruct(&entrant.EvrID) },
+					func() error { return s.StreamStruct(&entrant.XPID) },
 					func() error { return s.StreamNumber(binary.LittleEndian, &entrant.Flags) },
 				})
 				if err != nil {

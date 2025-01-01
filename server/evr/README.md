@@ -30,7 +30,7 @@ GameClient<-ConfigService:**STcpConnectionUnrequireEvent**
 GameClient->LoginService:**ChannelInfoRequest**\n
 GameClient<-LoginService:**ChannelInfoResponse**\n--EchoVRCE...--
 GameClient<-LoginService:**STcpConnectionUnrequireEvent**
-GameClient->LoginService:**UpdateProfile**\n--session=//2a4a1b12-2bf9-11ef-8dd5-66d3ff8a653b//\nevr_id=//OVR_ORG-123412341234--//
+GameClient->LoginService:**UpdateProfile**\n--session=//2a4a1b12-2bf9-11ef-8dd5-66d3ff8a653b//\nxp_id=//OVR_ORG-123412341234--//
 GameClient<-LoginService:**UpdateProfileSuccess**\n--user_id=//OVR_ORG-123412341234--//
 GameClient<-LoginService:**STcpConnectionUnrequireEvent**
 ```

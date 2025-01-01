@@ -112,7 +112,7 @@ func NewDefaultRating() types.Rating {
 	})
 }
 
-func CalculateNewPlayerRating(evrID evr.EvrId, players []PlayerInfo, teamSize int, blueWins bool) (types.Rating, error) {
+func CalculateNewPlayerRating(xpID evr.XPID, players []PlayerInfo, teamSize int, blueWins bool) (types.Rating, error) {
 
 	// copy the players slice so as to not modify the original
 	players = players[:]
@@ -127,13 +127,13 @@ func CalculateNewPlayerRating(evrID evr.EvrId, players []PlayerInfo, teamSize in
 		}
 
 		// Move the target player to the front of the list
-		if players[i].EvrID == evrID {
+		if players[i].XPID == xpID {
 			// Move the player to the front of the list
 			players[0], players[i] = players[i], players[0]
 		}
 	}
 
-	if len(players) == 0 || players[0].EvrID != evrID {
+	if len(players) == 0 || players[0].XPID != xpID {
 		return NewDefaultRating(), fmt.Errorf("player not found in players list")
 	}
 
