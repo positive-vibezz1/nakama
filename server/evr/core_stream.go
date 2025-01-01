@@ -39,6 +39,32 @@ var (
 	structValidate            = validator.New()
 )
 
+// Message is a Evr message that can be sent over the network.
+type Message interface {
+	Stream(s *EasyStream) error
+}
+
+type MessageWrapper struct {
+	Message Message
+}
+
+func NewMessageWrapper(m Message) *MessageWrapper {
+	return &MessageWrapper{Message: m}
+}
+
+func (m MessageWrapper) MarshalBinary() ([]byte, error) {
+	s := NewEasyStream(EncodeMode, nil)
+	if err := m.Message.Stream(s); err != nil {
+		return nil, err
+	}
+	return s.Bytes(), nil
+}
+
+func (m *MessageWrapper) UnmarshalBinary(data []byte) error {
+	s := NewEasyStream(DecodeMode, data)
+	return m.Message.Stream(s)
+}
+
 type EasyStream struct {
 	r    *bytes.Reader
 	w    *bytes.Buffer
@@ -46,6 +72,7 @@ type EasyStream struct {
 }
 
 func NewEasyStream(mode StreamMode, b []byte) *EasyStream {
+
 	s := &EasyStream{
 		Mode: mode,
 	}
@@ -57,6 +84,28 @@ func NewEasyStream(mode StreamMode, b []byte) *EasyStream {
 	default:
 	}
 	return s
+}
+
+func (s *EasyStream) IsReading() bool {
+	return s.Mode == DecodeMode
+}
+
+func (s *EasyStream) IsWriting() bool {
+	return s.Mode == EncodeMode
+}
+
+func (s *EasyStream) Read(p []byte) (n int, err error) {
+	if s.Mode != DecodeMode {
+		return 0, errInvalidMode
+	}
+	return s.r.Read(p)
+}
+
+func (s *EasyStream) Write(p []byte) (n int, err error) {
+	if s.Mode != EncodeMode {
+		return 0, errInvalidMode
+	}
+	return s.w.Write(p)
 }
 
 func (s *EasyStream) StreamSymbol(value *Symbol) error {
