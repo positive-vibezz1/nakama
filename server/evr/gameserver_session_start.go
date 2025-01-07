@@ -35,6 +35,7 @@ var (
 	ModeArenaPrivate   Symbol = ToSymbol("echo_arena_private")    // Private Echo Arena
 	ModeArenaTournment Symbol = ToSymbol("echo_arena_tournament") // Echo Arena Tournament
 	ModeArenaPublicAI  Symbol = ToSymbol("echo_arena_public_ai")  // Public Echo Arena AI
+	ModeArenaFreezeTag Symbol = ToSymbol("echo_arena_freezetag")  // Echo Arena Freeze Tag
 
 	ModeEchoCombatTournament Symbol = ToSymbol("echo_combat_tournament") // Echo Combat Tournament
 	ModeCombatPublic         Symbol = ToSymbol("echo_combat")            // Echo Combat
@@ -54,6 +55,7 @@ var (
 
 	// Valid levels by game mode
 	LevelsByMode = map[Symbol][]Symbol{
+		ModeArenaFreezeTag:       {LevelArena},
 		ModeArenaPublic:          {LevelArena},
 		ModeArenaPrivate:         {LevelArena},
 		ModeArenaTournment:       {LevelArena},
@@ -69,22 +71,24 @@ var (
 
 	// Valid roles for the game mode
 	RolesByMode = map[Symbol][]int{
-		ModeCombatPublic:  {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
-		ModeArenaPublic:   {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
-		ModeCombatPrivate: {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
-		ModeArenaPrivate:  {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
-		ModeSocialPublic:  {TeamSocial, TeamModerator},
-		ModeSocialPrivate: {TeamSocial, TeamModerator},
+		ModeArenaFreezeTag: {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
+		ModeCombatPublic:   {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
+		ModeArenaPublic:    {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
+		ModeCombatPrivate:  {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
+		ModeArenaPrivate:   {TeamBlue, TeamOrange, TeamSpectator, TeamModerator},
+		ModeSocialPublic:   {TeamSocial, TeamModerator},
+		ModeSocialPrivate:  {TeamSocial, TeamModerator},
 	}
 
 	// Roles that may be specified by the player when finding/joining a lobby session.
 	AlignmentsByMode = map[Symbol][]int{
-		ModeCombatPublic:  {TeamUnassigned, TeamSpectator},
-		ModeArenaPublic:   {TeamUnassigned, TeamSpectator},
-		ModeCombatPrivate: {TeamUnassigned, TeamSpectator, TeamBlue, TeamOrange},
-		ModeArenaPrivate:  {TeamUnassigned, TeamSpectator, TeamBlue, TeamOrange},
-		ModeSocialPublic:  {TeamUnassigned, TeamModerator, TeamSocial},
-		ModeSocialPrivate: {TeamUnassigned, TeamModerator, TeamSocial},
+		ModeCombatPublic:   {TeamUnassigned, TeamSpectator},
+		ModeArenaPublic:    {TeamUnassigned, TeamSpectator},
+		ModeArenaFreezeTag: {TeamUnassigned, TeamSpectator},
+		ModeCombatPrivate:  {TeamUnassigned, TeamSpectator, TeamBlue, TeamOrange},
+		ModeArenaPrivate:   {TeamUnassigned, TeamSpectator, TeamBlue, TeamOrange},
+		ModeSocialPublic:   {TeamUnassigned, TeamModerator, TeamSocial},
+		ModeSocialPrivate:  {TeamUnassigned, TeamModerator, TeamSocial},
 	}
 )
 
