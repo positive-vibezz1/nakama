@@ -25,6 +25,7 @@ type WhoAmI struct {
 	HasPassword          bool                 `json:"has_password"`
 	RecentLogins         map[string]time.Time `json:"recent_logins,omitempty"`
 	GuildGroups          []*GuildGroup        `json:"guild_groups,omitempty"`
+	DefualtActiveGuild   []string             `json:"default_active_guild,omitempty"`
 	VRMLSeasons          []string             `json:"vrml_seasons"`
 	MatchLabels          []*MatchLabel        `json:"match_labels"`
 	DefaultLobbyGroup    string               `json:"active_lobby_group,omitempty"`
@@ -40,12 +41,13 @@ type EvrIdLogins struct {
 
 func (d *DiscordAppBot) handleProfileRequest(ctx context.Context, logger runtime.Logger, nk runtime.NakamaModule, s *discordgo.Session, i *discordgo.InteractionCreate, targetID string, username string, includePriviledged bool, includePrivate bool) error {
 	whoami := &WhoAmI{
-		DiscordID:    targetID,
-		RecentLogins: make(map[string]time.Time),
-		DisplayNames: make([]string, 0),
-		DeviceLinks:  make([]string, 0),
-		GuildGroups:  make([]*GuildGroup, 0),
-		MatchLabels:  make([]*MatchLabel, 0),
+		DiscordID:          targetID,
+		RecentLogins:       make(map[string]time.Time),
+		DisplayNames:       make([]string, 0),
+		DeviceLinks:        make([]string, 0),
+		GuildGroups:        make([]*GuildGroup, 0),
+		DefualtActiveGuild: make([]string, 0),
+		MatchLabels:        make([]*MatchLabel, 0),
 	}
 
 	// Get the user's ID
