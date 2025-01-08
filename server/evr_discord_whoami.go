@@ -119,6 +119,13 @@ func (d *DiscordAppBot) handleProfileRequest(ctx context.Context, logger runtime
 		}
 	}
 
+	defaultActiveGuilds, err := GetDefaultActiveGuilds(ctx, nk, userID.String())
+	if err != nil {
+		return fmt.Errorf("failed to fetch default active guilds: %w", err)
+	}
+
+	whoami.DefualtActiveGuild = defaultActiveGuilds
+
 	loginHistory, err := LoginHistoryLoad(ctx, nk, userID.String())
 	if err != nil {
 		return fmt.Errorf("error getting device history: %w", err)

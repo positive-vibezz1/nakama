@@ -1,12 +1,15 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"slices"
 
 	"github.com/bits-and-blooms/bitset"
 	"github.com/gofrs/uuid/v5"
 	"github.com/heroiclabs/nakama-common/api"
+	"github.com/heroiclabs/nakama-common/runtime"
 	"github.com/samber/lo"
 )
 
@@ -81,6 +84,17 @@ type GroupMetadata struct {
 
 	// UserIDs that are required to go to community values when the first join the social lobby
 	CommunityValuesUserIDs []string `json:"community_values_user_ids"`
+}
+
+func GetDefaultActiveGuilds(ctx context.Context, nk runtime.NakamaModule, userID string) ([]string, error) {
+	// Example logic: Fetch metadata and determine default guilds
+	accountMetadata, err := GetAccountMetadata(ctx, nk, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch metadata for user %s: %w", userID, err)
+	}
+
+	// Assuming metadata has a method to get guilds
+	return accountMetadata.GetDefaultGuilds(), nil
 }
 
 func NewGuildGroupMetadata(guildID string) *GroupMetadata {
